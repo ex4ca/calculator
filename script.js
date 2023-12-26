@@ -13,7 +13,7 @@ class Calculator {
     }
 
     delete() {
-
+        this.currentOperand = this.currentOperand.toString().slice(0, -1);
     }
 
     appendNumber(number) {
@@ -62,9 +62,38 @@ class Calculator {
         this.previousOperand = '';
     }
 
+    getDisplayNumber(number) {
+        // split into before and after decimal place
+        const stringNumber = number.toString();
+        const beforeDecimal = parseFloat(stringNumber.split('.')[0]);
+        const afterDecimal = stringNumber.split('.')[1];
+
+        // set the display for before the decimal
+        let beforeDisplay;
+        if (isNaN(beforeDecimal)) {
+            beforeDisplay = '';
+        } else {
+            beforeDisplay = beforeDecimal.toLocaleString('en', {
+                maximumFractionDigits: 0
+            })
+        }
+
+        // set the display for after the decimal
+        if (afterDecimal != null) {
+            return `${beforeDisplay}.${afterDecimal}`;
+        } else {
+            return beforeDisplay;
+        }
+
+    }
+
     updateDisplay() {
-        this.currentOperandText.innerText = this.currentOperand;
-        this.previousOperandText.innerText = this.previousOperand;
+        this.currentOperandText.innerText = this.getDisplayNumber(this.currentOperand);
+        if (this.operation != null) {
+            this.previousOperandText.innerText = `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+        } else {
+            this.previousOperandText.innerText = '';
+        }
     }
 }
 
@@ -102,6 +131,11 @@ equalsButton.addEventListener(('click'), button => {
 
 allClearButton.addEventListener(('click'), button => {
     calculator.clear();
+    calculator.updateDisplay();
+});
+
+deleteButton.addEventListener(('click'), button => {
+    calculator.delete();
     calculator.updateDisplay();
 });
 
